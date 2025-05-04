@@ -1,0 +1,18 @@
+.btn {
+  width: 150px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+.btn {
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #eed1d1;
+  color: rgb(36, 35, 35);
+}
+.btn:hover,
+.btn:focus,
+.btn:active {
+  background-color: #a19d9d;
+  outline: none;
+}
