@@ -1,64 +1,53 @@
 import { useState, useEffect } from 'react';
 import React from 'react';
-import Description from '../Description/Description';
-import Feedback from '../Feedback/Feedback';
-import Options from '../Options/Options';
-import Notification from '../Notification/Notification';
+import ContactForm from '../ContactForm/ContactForm';
+import ContactList from '../ContactList/ContactList';
 
-export default function App() {
-  const [values, setFeedback] = useState(() => {
-    const savedValues = window.localStorage.getItem('saved-values');
+import SearchBox from '../SearchBox/SearchBox';
 
-    if (savedValues !== null) {
-      return JSON.parse(savedValues);
+function App() {
+  const [contacts, setContacts] = useState(() => {
+    const savedContacts = localStorage.getItem('contacts');
+    if (savedContacts) {
+      return JSON.parse(savedContacts);
     }
-
-    return {
-      good: 0,
-      neutral: 0,
-      bad: 0,
-    };
+    return [
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
+    ];
   });
-  const updateFeedback = (feedbackType) => {
-    setFeedback((prevFeedback) => ({
-      ...prevFeedback,
-      [feedbackType]: prevFeedback[feedbackType] + 1,
-    }));
+  const [filter, setFilter] = useState('');
+
+  const addContact = (newContact) => {
+    setContacts((prevContacts) => {
+      return [...prevContacts, newContact];
+    });
   };
+
+  const deleteContact = (contactId) => {
+    setContacts((prevContacts) => {
+      return prevContacts.filter((contact) => contact.id !== contactId);
+    });
+  };
+
+  const searchedContact = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(filter.toLowerCase()),
+  );
+
   useEffect(() => {
-    window.localStorage.setItem('saved-values', JSON.stringify(values));
-  }, [values]);
-
-  const resetFeedback = () => {
-    setFeedback({ good: 0, neutral: 0, bad: 0 });
-  };
-
-  const totalFeedback = values.good + values.neutral + values.bad;
-
-  const positiveFeedback = Math.round((values.good / totalFeedback) * 100);
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   return (
     <div>
-      <Description
-        title="Sip Happens Café"
-        content="Please leave your feedback about our service by selecting one of the
-        options below."
-      ></Description>
-      <Options
-        onLeaveFeedback={updateFeedback}
-        totalFeedBack={totalFeedback}
-        onResetFeedback={resetFeedback}
-      ></Options>
-
-      {totalFeedback > 0 ? (
-        <Feedback
-          values={values}
-          totalFeedback={totalFeedback}
-          positiveFeedback={positiveFeedback}
-        ></Feedback>
-      ) : (
-        <Notification></Notification>
-      )}
+      <h1>Phonebook</h1>
+      <ContactForm onAdd={addContact} />
+      <SearchBox value={filter} onFilterChange={setFilter} />
+      <ContactList contacts={searchedContact} onDelete={deleteContact} />
     </div>
   );
 }
+
+export default App;
